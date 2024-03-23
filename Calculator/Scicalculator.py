@@ -4,10 +4,11 @@ from tkinter import ttk
 import numpy as np
 
 
-
 class Calculator:
     def __init__(self,root):
         self.root = root
+        self.root.resizable(False,False)
+        
 
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill="both",expand= True)
@@ -16,6 +17,8 @@ class Calculator:
         self.notebook.add(self.calculator_frame,text="Calculator")
         self.matrix_calculator_frame = Frame(self.notebook)
         self.notebook.add(self.matrix_calculator_frame,text="Matrix Calculator")
+
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
         self.create_calculator()
         self.create_matrix_calculator()
@@ -41,7 +44,7 @@ class Calculator:
                 entry.insert(0, "Error")
 
 
-        entry = Entry(self.calculator_frame, width=35, borderwidth=5)
+        entry = Entry(self.calculator_frame, width=35, borderwidth=5,font={'size':20})
         entry.grid(row=0, column=0, columnspan=4, padx=10, pady=20)
 
         buttons = [
@@ -52,14 +55,14 @@ class Calculator:
         ]
 
         for (text, row, column) in buttons:
-            button = Button(self.calculator_frame, text=text, padx=40, pady=20,
+            button = Button(self.calculator_frame, text=text, padx=50, pady=20,
                             command=lambda t=text: button_click(t))
             button.grid(row=row, column=column)
 
-        clear_button = Button(self.calculator_frame, text='Clear', padx=77, pady=20, command=clear)
+        clear_button = Button(self.calculator_frame, text='Clear', padx=95, pady=20, command=clear)
         clear_button.grid(row=5, column=0, columnspan=2)
 
-        equal_button = Button(self.calculator_frame, text='Calculate', padx=68, pady=20, command=equal)
+        equal_button = Button(self.calculator_frame, text='Calculate', padx=85, pady=20, command=equal)
         equal_button.grid(row=5, column=2, columnspan=2)
 
 
@@ -182,6 +185,14 @@ class Calculator:
         curr = self.e.get()
         self.e.delete(0, END)
         self.e.insert(0, str(curr) + str(num))
+
+    def on_tab_change(self,event):
+        current_tab = self.notebook.tab(self.notebook.select(), "text")
+        if current_tab == "Calculator":
+            self.root.geometry("460x420")
+        elif current_tab == "Matrix Calculator":
+            self.root.geometry("710x350")
+
 
 if __name__ == "__main__":
     root = Tk()
