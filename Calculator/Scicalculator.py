@@ -4,9 +4,12 @@ from tkinter import ttk
 import numpy as np
 
 
+
+
 class Calculator:
     def __init__(self,root):
         self.root = root
+        self.root.title("My Calculator")
         self.root.resizable(False,False)
         
 
@@ -82,9 +85,9 @@ class Calculator:
         self.matrix_frame2.grid(row=mat_frame_row, column=1, padx=10, pady=10)
 
         self.res_frame = Frame(self.matrix_calculator_frame)
-        self.res_frame.grid(row=mat_frame_row,column=2,padx=10,pady=10)
+        self.res_frame.grid(row=mat_frame_row,column=2,padx=20,pady=10)
 
-        self.operation = ttk.Combobox(self.matrix_calculator_frame, values=["Add", "Subtract", "Multiply"])
+        self.operation = ttk.Combobox(self.matrix_calculator_frame, values=["Add", "Subtract", "Multiply","Determinant"])
         self.operation.set("Add")
         self.operation.grid(row=3, column=0, padx=5, pady=10)
 
@@ -169,10 +172,38 @@ class Calculator:
         elif operation == 'Multiply':
             res = mat1@mat2
         
+        elif operation=="Determinant":
+            self.Determinant(mat1,mat2)
+            return
+        
+        elif operation=="Det - Matrix 2":
+            ...
+        
         self.print_result(res)
         
         # print(matrix1,matrix2)
 
+
+    def Determinant(self,mat1,mat2):
+        det1 = np.linalg.det(mat1)
+        det2 = np.linalg.det(mat2)
+        self.clear_result_frame()
+        res_label = Label(self.res_frame,text="Determinant")
+        res_label.grid(row=0,column=0, columnspan=self.dimensions.get())
+        res_1 = Entry(self.res_frame,width=5,font={"size":7})
+        res_1.insert(0,det1)
+        res_1.grid(row=1,column=0,padx=10,pady=10)
+        res_2 = Entry(self.res_frame,width=5,font={"size":7})
+        res_2.insert(0,det2)
+        res_2.grid(row=1,column=1,padx=10,pady=10)
+        res_label_1 = Label(self.res_frame,text="Matrix 1")
+        res_label_1.grid(row=2,column=0,columnspan=1)
+        res_label_2 = Label(self.res_frame,text="Matrix 2")
+        res_label_2.grid(row=2,column=1,columnspan=1)
+
+
+
+        
     def clear_matrix_frames(self):
         for widget in self.matrix_frame1.winfo_children():
             widget.destroy()
