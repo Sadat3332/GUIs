@@ -11,7 +11,15 @@ class Calculator:
         self.root = root
         self.root.title("My Calculator")
         self.root.resizable(False,False)
-        
+        self.root.configure(background = 'green')
+
+        # self.style = ttk.Style()
+
+        # Style configurations
+        self.style = ttk.Style()
+        self.style.configure('TNotebook', tabposition='n')
+        # self.style.configure('TNotebook.Tab', padding=[10, 5], font=('Arial', 12))
+
 
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill="both",expand= True)
@@ -26,7 +34,6 @@ class Calculator:
         self.create_calculator()
         self.create_matrix_calculator()
     
-
     def create_calculator(self):
 
         def button_click(char):
@@ -47,6 +54,7 @@ class Calculator:
                 entry.insert(0, "Error")
 
 
+        self.calculator_frame.bind('<Return>',lambda x : equal()) # bind enter key
         entry = Entry(self.calculator_frame, width=35, borderwidth=5,font={'size':20})
         entry.grid(row=0, column=0, columnspan=4, padx=10, pady=20)
 
@@ -87,7 +95,8 @@ class Calculator:
         self.res_frame = Frame(self.matrix_calculator_frame)
         self.res_frame.grid(row=mat_frame_row,column=2,padx=20,pady=10)
 
-        self.operation = ttk.Combobox(self.matrix_calculator_frame, values=["Add", "Subtract", "Multiply","Determinant"])
+        self.operation = ttk.Combobox(self.matrix_calculator_frame, values=["Add", "Subtract", "Multiply","Determinant","Inverse Mat 1",
+                                                                            "Inverse Mat 2"])
         self.operation.set("Add")
         self.operation.grid(row=3, column=0, padx=5, pady=10)
 
@@ -109,7 +118,7 @@ class Calculator:
             for j in range(dimension):
                 entry1 = Entry(self.matrix_frame1, width=5)
                 entry2 = Entry(self.matrix_frame2, width=5)
-                entry1.grid(row=i, column=j, padx=5, pady=5)
+                entry1.grid(row=i, column=j, padx=5, pady=5,)
                 entry2.grid(row=i, column=j, padx=5, pady=5)
                 row_entries1.append(entry1)
                 row_entries2.append(entry2)
@@ -128,7 +137,7 @@ class Calculator:
             row_result = []
             for j in range(dimension):
                 res = Entry(self.res_frame, width=5)
-                res.insert(0,result[i-1][j])
+                res.insert(0,round(result[i-1][j],2))
                 res.config(state='disabled')
                 res.grid(row=i, column=j, padx=5, pady=5)
 
@@ -176,13 +185,29 @@ class Calculator:
             self.Determinant(mat1,mat2)
             return
         
-        elif operation=="Det - Matrix 2":
-            ...
+        elif operation=="Inverse Mat 1":
+            self.Inverse(mat1)
+            return
+        
+        elif operation == "Inverse Mat 2":
+            self.Inverse(mat2)
+            return
         
         self.print_result(res)
         
         # print(matrix1,matrix2)
 
+    def Inverse(self,mat):
+        try:
+            inverse_mat = np.linalg.inv(mat)
+            self.print_result(inverse_mat)
+        
+        except np.linalg.LinAlgError:
+                    self.clear_result_frame()
+                    res_label = Label(self.res_frame,text="Error:")
+                    res_label.grid(row=0,column=0, columnspan=self.dimensions.get())
+                    res_label = Label(self.res_frame,text="Inverse Not Defined")
+                    res_label.grid(row=1,column=0, columnspan=self.dimensions.get())
 
     def Determinant(self,mat1,mat2):
         det1 = np.linalg.det(mat1)
