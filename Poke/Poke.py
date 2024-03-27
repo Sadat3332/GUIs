@@ -6,7 +6,7 @@ class Pokedex:
     def __init__(self,root):
 
         self.root = root
-        self.root.geometry('480x400')
+        self.root.geometry('550x440')
 
         self.poke_df = pd.read_csv('Poke/poke.csv')
 
@@ -41,7 +41,9 @@ class Pokedex:
         self.scrollbar = ttk.Scrollbar(self.pokemon_list_frame, orient='vertical')
         self.scrollbar.pack(side='right', fill='y')
 
-        self.pokemon_listbox = Listbox(self.pokemon_list_frame, yscrollcommand=self.scrollbar.set,background='#d3d9ce')
+        self.pokemon_listbox = Listbox(self.pokemon_list_frame, yscrollcommand=self.scrollbar.set,
+                                       background='#ad2f4c',width=23,fg='white',
+                                       font=('Helvetica', 10,"bold"))
         self.pokemon_listbox.pack(side='left', fill='both', expand=True)
 
         self.scrollbar.config(command=self.pokemon_listbox.yview)
@@ -64,32 +66,36 @@ class Pokedex:
         takefocus= 1,
         cursor='man').pack(fill=Y, expand=True)
 
-        self.pokemon_image = Label(self.pokemon_display_frame, text="Pokemon Image", padx=10, pady=10,
-                                   bg='#b9bdc4')
-        self.pokemon_image.pack(pady=5,expand=True)
+        self.pokemon_name_label = Label(self.pokemon_display_frame, text="Bulbasaur", padx=10, pady=10,
+                                   bg='#f5edef',
+                                   font=('Helvetica', 12,"bold"))
+        self.pokemon_name_label.pack(pady=5,expand=True)
 
-        self.pokemon_display_frame.config(bg='#b9bdc4')
+        self.pokemon_display_frame.config(bg='#f5edef')
 
 
         self.pokeimage = PhotoImage(file='Poke/images/1.png',).subsample(1)
-        self.pokelabel = Label(self.pokemon_display_frame,image=self.pokeimage,bg='#b9bdc4')
+        self.pokelabel = Label(self.pokemon_display_frame,image=self.pokeimage,bg='#f5edef')
         self.pokelabel.pack()
-        self.pokelabel.configure(image=self.pokeimage,bg='#b9bdc4')
+        self.pokelabel.configure(image=self.pokeimage,bg='#f5edef')
 
-        self.text = Text(self.pokemon_display_frame,height=10,width=40,bg='#d3d9ce')
+        self.text = Text(self.pokemon_display_frame,height=10,width=40,bg='#f7f2f3')
         self.text.pack(side='bottom',anchor='sw')
-        self.text.insert(END, """This is a short and sweet description of this pokemon""")     
+        self.text.insert(END, self.poke_df.loc[0,'Description'])     
 
 
     def poke_selected(self):
-
         # self.pokelabel.destroy()
+        
 
         curr_index = (self.pokemon_listbox.curselection()[0])
+        self.pokemon_name_label.config(text=str(self.poke_df.loc[curr_index,'name'][4:]))
         print(self.poke_df.loc[curr_index,'images'])
         self.pokeimage = PhotoImage(file=str(self.poke_df.loc[curr_index,'images']).strip()).subsample(1)
         self.pokelabel.configure(image=self.pokeimage)
         self.pokelabel.pack()
+        self.text.delete('1.0',END)
+        self.text.insert(END,self.poke_df.loc[curr_index,'Description'])
         
 
         
