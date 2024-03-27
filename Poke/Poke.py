@@ -1,12 +1,14 @@
 from tkinter import *
 from tkinter import ttk
-
+import pandas as pd
 
 class Pokedex:
     def __init__(self,root):
 
         self.root = root
         self.root.geometry('480x380')
+
+        self.poke_df = pd.read_csv('Poke/poke.csv')
 
         self.style = ttk.Style()
         self.style.configure('TNotebook', tabposition='n')
@@ -44,12 +46,8 @@ class Pokedex:
 
         self.scrollbar.config(command=self.pokemon_listbox.yview)
         print(self.pokemon_listbox.curselection())
-        self.pokemon_listbox.bind('<Return>',lambda x : print(self.pokemon_listbox.get([self.pokemon_listbox.curselection()])))
-        pokemon_names = ["Bulbasaur", "Charmander", "Squirtle", "Pikachu", "Jigglypuff",
-                         "Bulbasaur", "Charmander", "Squirtle", "Pikachu", "Jigglypuff",
-                         "Bulbasaur", "Charmander", "Squirtle", "Pikachu", "Jigglypuff",
-                         "Bulbasaur", "Charmander", "Squirtle", "Pikachu", "Jigglypuff",
-                         "Bulbasaur", "Charmander", "Squirtle", "Pikachu", "Jigglypuff"]
+        self.pokemon_listbox.bind('<Return>',self.poke_selected)
+        pokemon_names = list(self.poke_df['name'])
         for name in pokemon_names:
             self.pokemon_listbox.insert('end', name)
 
@@ -67,12 +65,17 @@ class Pokedex:
         self.pokemon_image.pack()
 
 
-        self.pokeimage = PhotoImage(file='image.png',).subsample(1)
+        self.pokeimage = PhotoImage(file='Poke/images/1.png',).subsample(1)
         self.pokelabel = Label(self.pokemon_display_frame,image=self.pokeimage)
         self.pokelabel.pack()
         self.text = Text(self.pokemon_display_frame,height=5,width=40,bg='#d3d9ce')
         self.text.pack(side='bottom',anchor='sw',pady= 8)
-        self.text.insert(END, """This is a short and sweet description of this pokemon""")       
+        self.text.insert(END, """This is a short and sweet description of this pokemon""")     
+
+
+    def poke_selected(self):
+        return
+
 
     
     
