@@ -124,6 +124,8 @@ class Pokedex:
         attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed']
         for bar,attr in zip(self.progress_bars,attributes):
             bar.config(value=self.poke_df.loc[self.curr_index, attr.lower()])
+        self.text.delete('1.0',END)
+        self.text.insert(END,self.poke_df.loc[self.curr_index,'Description'])
 
     def update_pokemon_image(self, image_path):
         try:
