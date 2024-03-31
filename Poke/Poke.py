@@ -5,8 +5,9 @@ import pandas as pd
 class Pokedex:
     def __init__(self, root):
         self.root = root
-        self.root.geometry('520x440')
+        self.root.geometry('550x440')
         self.root.title("Pokedex")
+        self.root.resizable(False,False)
 
         self.icon = PhotoImage(file='images/pokedex-icon.png')
         root.iconphoto(False, self.icon)
@@ -31,6 +32,23 @@ class Pokedex:
 
         self.create_Pokemon_tab()
         self.create_Info_tab()
+        root.bind("<Left>", self.switch_tab_left)
+        root.bind("<Right>", self.switch_tab_right)
+
+    def switch_tab_left(self, event):
+        current_tab = self.tabs.index(self.tabs.select())
+        if current_tab > 0:
+            self.tabs.select(current_tab - 1)
+
+    def switch_tab_right(self, event):
+        current_tab = self.tabs.index(self.tabs.select())
+        try:
+            self.tabs.select(current_tab+1)
+        
+        except:
+            ...
+        # if current_tab < self.tabs.index("end"):
+        #     self.tabs.select(current_tab + 1)
 
 
     def create_pokemon_list(self):
@@ -96,16 +114,16 @@ class Pokedex:
 
 
     def create_attributes_bar(self):
-        self.attribute_frame = Frame(self.info_tab, borderwidth=5, relief="groove")
+        self.attribute_frame = Frame(self.info_tab, borderwidth=1, relief="groove",bg='white')
         self.attribute_frame.grid(row=0, column=1, padx=10, pady=10, sticky='nw')
 
-        attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed']
-        colors = ['#08d141', '#c7042b', '#f76a05', '#f705b3', '#f7f705','#058ef7'] 
+        attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed','Capture_Rate']
+        colors = ['#08d141', '#c7042b', '#f76a05', '#f705b3', '#f7f705','#058ef7','#51ff00'] 
 
         self.progress_bars = []
         for i, (attr, color) in enumerate(zip(attributes, colors)):
             val = int(round(self.poke_df.loc[self.curr_index, attr.lower()],0))
-            Label(self.attribute_frame, text=attr, padx=10, pady=10, font=('Helvetica', 10, 'bold')).grid(row=i, column=0, sticky='w')
+            Label(self.attribute_frame, text=attr, padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=i, column=0, sticky='w')
             s = ttk.Style()
             s.theme_use('default')
             s.configure(f"{attr}.Horizontal.TProgressbar", background=color)  
@@ -115,17 +133,27 @@ class Pokedex:
                                         style=f"{attr}.Horizontal.TProgressbar")  
             progressbar.grid(row=i, column=1, padx=10, sticky='w')
             self.progress_bars.append(progressbar)
+        
+        Label(self.attribute_frame, text= 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m',
+               padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=8, column=0, sticky='w')
+        Label(self.attribute_frame, text='Weight: '+ str(self.poke_df.loc[self.curr_index,'weight_kg']) + ' kg'
+              , padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=9, column=0, sticky='w')
 
 
     def create_Info_tab(self):
         self.info_frame_image = Frame(self.info_tab,bg='white')
-        self.info_frame_image.grid(row=0,column=0)
+        self.info_frame_image.grid(row=0,column=0,padx=10)
+        self.pokemon_info_image_label = Label(self.info_frame_image, bg='white')
+        self.pokemon_info_image_label.config(image=self.pokeimage)
+        self.pokemon_info_image_label.grid(row=0, column=0, padx=10, pady=5, sticky='nw')
+
         self.pokemon_name_label_info = Label(self.info_frame_image, text="Bulbasaur", padx=10,
                                         bg='white',
                                         font=('Helvetica', 12, "bold"),
                                         anchor='nw'
                                         )
         self.pokemon_name_label_info.grid(row=1,column=0,sticky='nw')
+        
 
         self.pokemon_types_frame  = Frame(self.info_frame_image,bg='white')
         self.pokemon_types_frame.grid(row=2,column=0,sticky='nw',padx=8)
@@ -143,11 +171,11 @@ class Pokedex:
         self.pokemon_type_label_1.grid(row=2,column=0,sticky='nw')
         self.pokemon_type_label_2.grid(row=2,column=1,sticky='nw')
 
-        self.pokemon_info_image_label = Label(self.info_frame_image, bg='white')
-        self.pokemon_info_image_label.config(image=self.pokeimage)
-        self.pokemon_info_image_label.grid(row=0, column=0, padx=10, pady=5, sticky='nw')
 
         self.create_attributes_bar()
+
+
+
         self.pokemon_listbox.bind('<Return>', lambda x: self.poke_selected())
 
 
@@ -177,7 +205,7 @@ class Pokedex:
         image_path = self.poke_df.loc[self.curr_index, 'images'].strip()
         self.update_pokemon_image(image_path)
 
-        attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed']
+        attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed','Capture_Rate']
         for bar,attr in zip(self.progress_bars,attributes):
             bar.config(value=self.poke_df.loc[self.curr_index, attr.lower()])
         self.text.delete('1.0',END)
