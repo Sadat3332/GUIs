@@ -42,17 +42,13 @@ class Pokedex:
 
     def switch_tab_right(self, event):
         current_tab = self.tabs.index(self.tabs.select())
-        try:
-            self.tabs.select(current_tab+1)
-        
-        except:
-            ...
-        # if current_tab < self.tabs.index("end"):
-        #     self.tabs.select(current_tab + 1)
+        if current_tab < 1:
+            self.tabs.select(current_tab + 1)
 
 
     def create_pokemon_list(self):
-        self.pokemon_list_frame = ttk.Frame(self.pokemon_tab_frame)
+        self.pokemon_list_frame = Frame(self.pokemon_tab_frame,borderwidth=3, relief="groove",
+                                        bg='red')
         self.pokemon_list_frame.pack(side='right', fill='y', expand=True)
 
         self.scrollbar = ttk.Scrollbar(self.pokemon_list_frame, orient='vertical')
@@ -74,7 +70,9 @@ class Pokedex:
     
     def create_pokemon_image(self):
         
-        self.pokemon_display_frame = Frame(self.pokemon_tab_frame)
+        self.pokemon_display_frame = Frame(self.pokemon_tab_frame, borderwidth=5, relief="groove",
+                                            highlightbackground="black", highlightthickness=2)
+
         self.pokemon_display_frame.pack(side='left', fill='both', expand=True)
         #separator
         ttk.Separator(
@@ -134,10 +132,12 @@ class Pokedex:
             progressbar.grid(row=i, column=1, padx=10, sticky='w')
             self.progress_bars.append(progressbar)
         
-        Label(self.attribute_frame, text= 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m',
-               padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=8, column=0, sticky='w')
-        Label(self.attribute_frame, text='Weight: '+ str(self.poke_df.loc[self.curr_index,'weight_kg']) + ' kg'
-              , padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=9, column=0, sticky='w')
+        self.height_label = Label(self.attribute_frame, text= 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m',
+               padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white')
+        self.height_label.grid(row=8, column=0, sticky='w')
+        self.weight_label = Label(self.attribute_frame, text='Weight: '+ str(self.poke_df.loc[self.curr_index,'weight_kg']) + ' kg'
+              , padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white')
+        self.weight_label.grid(row=9, column=0, sticky='w')
 
 
     def create_Info_tab(self):
@@ -198,7 +198,7 @@ class Pokedex:
         self.pokemon_name_label.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
         self.pokemon_name_label_info.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
 
-        self.pokemon_type_label_1.config(text=self.get_type()[0])
+        self.pokemon_type_label_1.config(text=self.get_type()[0],bg='red')
         self.pokemon_type_label_2.config(text=self.get_type()[1])
 
         # Update image
@@ -210,6 +210,9 @@ class Pokedex:
             bar.config(value=self.poke_df.loc[self.curr_index, attr.lower()])
         self.text.delete('1.0',END)
         self.text.insert(END,self.poke_df.loc[self.curr_index,'Description'])
+
+        self.height_label.config(text = 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m')
+        self.weight_label.config(text='Weight: '+ str(self.poke_df.loc[self.curr_index,'weight_kg']) + ' kg')
 
     def update_pokemon_image(self, image_path):
         try:
