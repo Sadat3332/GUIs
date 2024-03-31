@@ -5,7 +5,7 @@ import pandas as pd
 class Pokedex:
     def __init__(self, root):
         self.root = root
-        self.root.geometry('550x440')
+        self.root.geometry('580x440')
         self.root.title("Pokedex")
         self.root.resizable(False,False)
 
@@ -55,7 +55,7 @@ class Pokedex:
         self.scrollbar.pack(side='right', fill='y')
 
         self.pokemon_listbox = Listbox(self.pokemon_list_frame, yscrollcommand=self.scrollbar.set,
-                                       background='#ad2f4c', width=23, fg='white',
+                                       background='#fa2828', width=23, fg='white',
                                        font=('Helvetica', 10, "bold"))
         self.pokemon_listbox.pack(side='left', fill='both', expand=True)
 
@@ -98,7 +98,7 @@ class Pokedex:
         self.pokelabel.configure(image=self.pokeimage, bg='#f5edef')
 
         # Description
-        self.text = Text(self.pokemon_display_frame, height=10, width=40, bg='#e6e1e2')
+        self.text = Text(self.pokemon_display_frame, height=10, width=45, bg='#e6e1e2')
         self.text.pack(side='bottom', anchor='sw')
         self.text.insert(END, self.poke_df.loc[0, 'Description'])
 
@@ -115,13 +115,15 @@ class Pokedex:
         self.attribute_frame = Frame(self.info_tab, borderwidth=1, relief="groove",bg='white')
         self.attribute_frame.grid(row=0, column=1, padx=10, pady=10, sticky='nw')
 
+        Label(self.attribute_frame, text="Base Stats", 
+              font=('Helvetica', 12, 'bold'),bg='white',pady=8,padx=5).grid(row=0, column=0,sticky='w')
         attributes = ['HP', 'Attack', 'Defense', 'Sp_Attack', 'Sp_Defense','Speed','Capture_Rate']
         colors = ['#08d141', '#c7042b', '#f76a05', '#f705b3', '#f7f705','#058ef7','#51ff00'] 
 
         self.progress_bars = []
         for i, (attr, color) in enumerate(zip(attributes, colors)):
             val = int(round(self.poke_df.loc[self.curr_index, attr.lower()],0))
-            Label(self.attribute_frame, text=attr, padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=i, column=0, sticky='w')
+            Label(self.attribute_frame, text=attr, padx=10, pady=10, font=('Helvetica', 10, 'bold'),bg='white').grid(row=i+1, column=0, sticky='w')
             s = ttk.Style()
             s.theme_use('default')
             s.configure(f"{attr}.Horizontal.TProgressbar", background=color)  
@@ -129,7 +131,7 @@ class Pokedex:
                                         length=100, 
                                         mode='determinate', value=val, 
                                         style=f"{attr}.Horizontal.TProgressbar")  
-            progressbar.grid(row=i, column=1, padx=10, sticky='w')
+            progressbar.grid(row=i+1, column=1, padx=10, sticky='w')
             self.progress_bars.append(progressbar)
         
         self.height_label = Label(self.attribute_frame, text= 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m',
@@ -141,7 +143,8 @@ class Pokedex:
 
 
     def create_Info_tab(self):
-        self.info_frame_image = Frame(self.info_tab,bg='white')
+        self.info_frame_image = Frame(self.info_tab,bg='white',borderwidth=4, relief="groove",
+                                            highlightbackground="black", highlightthickness=2)
         self.info_frame_image.grid(row=0,column=0,padx=10)
         self.pokemon_info_image_label = Label(self.info_frame_image, bg='white')
         self.pokemon_info_image_label.config(image=self.pokeimage)
@@ -149,7 +152,7 @@ class Pokedex:
 
         self.pokemon_name_label_info = Label(self.info_frame_image, text="Bulbasaur", padx=10,
                                         bg='white',
-                                        font=('Helvetica', 12, "bold"),
+                                        font=('Helvetica', 14, "bold"),
                                         anchor='nw'
                                         )
         self.pokemon_name_label_info.grid(row=1,column=0,sticky='nw')
@@ -160,12 +163,12 @@ class Pokedex:
         
         self.pokemon_type_label_1 = Label(self.pokemon_types_frame, text=self.get_type()[0], padx=2,
                                         bg='white',
-                                        font=('Helvetica', 8, "bold"),
+                                        font=('Helvetica', 10, "bold"),
                                         anchor='nw'
                                         )
         self.pokemon_type_label_2 = Label(self.pokemon_types_frame, text=(self.get_type()[1]), padx=2,
                                         bg='white',
-                                        font=('Helvetica', 8, "bold"),
+                                        font=('Helvetica', 10, "bold"),
                                         anchor='nw'
                                         )
         self.pokemon_type_label_1.grid(row=2,column=0,sticky='nw')
@@ -198,7 +201,7 @@ class Pokedex:
         self.pokemon_name_label.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
         self.pokemon_name_label_info.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
 
-        self.pokemon_type_label_1.config(text=self.get_type()[0],bg='red')
+        self.pokemon_type_label_1.config(text=self.get_type()[0])
         self.pokemon_type_label_2.config(text=self.get_type()[1])
 
         # Update image
