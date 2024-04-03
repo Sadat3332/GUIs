@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
-
+from math import *
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
@@ -12,13 +14,11 @@ class Calculator:
         self.root.title("My Calculator")
         self.root.resizable(False,False)
         self.root.configure(background = 'green')
+        self.root.protocol("WM_DELETE_WINDOW", self.root.quit)
 
-        # self.style = ttk.Style()
 
-        # Style configurations
         self.style = ttk.Style()
         self.style.configure('TNotebook', tabposition='n')
-        # self.style.configure('TNotebook.Tab', padding=[10, 5], font=('Arial', 12))
 
 
         self.notebook = ttk.Notebook(root)
@@ -26,13 +26,18 @@ class Calculator:
 
         self.calculator_frame = Frame(self.notebook)
         self.notebook.add(self.calculator_frame,text="Calculator")
+
         self.matrix_calculator_frame = Frame(self.notebook)
         self.notebook.add(self.matrix_calculator_frame,text="Matrix Calculator")
+
+        self.graph_tab = Frame(self.notebook)
+        self.notebook.add(self.graph_tab,text="Graphing Utility")
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
         self.create_calculator()
         self.create_matrix_calculator()
+        self.create_graphing_frame()
     
     def create_calculator(self):
 
@@ -73,9 +78,9 @@ class Calculator:
         clear_button = Button(self.calculator_frame, text='Clear', padx=95, pady=20, command=clear)
         clear_button.grid(row=5, column=0, columnspan=2)
 
-        equal_button = Button(self.calculator_frame, text='Calculate', padx=85, pady=20, command=equal)
+        equal_button = Button(self.calculator_frame, text='Calculate', padx=85, pady=20, command=equal,
+                              bg='#fafafa')
         equal_button.grid(row=5, column=2, columnspan=2)
-
 
     def create_matrix_calculator(self):
         self.dimensions = ttk.Combobox(self.matrix_calculator_frame, values=[2, 3, 4, 5])
@@ -125,6 +130,39 @@ class Calculator:
             self.entries1.append(row_entries1)
             self.entries2.append(row_entries2)
 
+
+    def create_graphing_frame(self):
+        self.func_entry = Entry(self.graph_tab,font=('Helvetica',15,'bold'),relief='groove',bd=4)
+        self.func_entry.pack(side="top", fill="x", padx=10, pady=10)
+        self.func_entry.insert(0, "sin(x)")
+
+        self.graph_button = Button(self.graph_tab, text="Graph", command=self.plot_graph)
+        self.graph_button.pack(side="top", padx=10, pady=5)
+
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_tab)
+        self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
+
+    def plot_graph(self):
+        self.ax.clear()
+        try:
+            x1 = list(np.arange(-10,11,0.2))
+            x2 = list(np.arange(0.000001,15,0.2))
+            y = [eval(self.func_entry.get()) for x in x1]
+            
+            self.ax.plot(x1, y,label= self.func_entry.get())
+            self.ax.plot(x1,[0 for x in x1],c = 'black')
+            self.ax.set_title('Graphing Tool')
+            self.ax.grid()
+            self.ax.legend()
+            self.ax.set_xlabel('X Axis')
+            self.ax.set_ylabel('Y Axis')
+            self.canvas.draw()
+        except Exception as e:
+            print(e)
+            self.ax.set_title('Invalid Function')
+            self.ax.text(0.5, 0.5, "Invalid function", ha='center', va='center', fontsize=12, color='red')
+            self.canvas.draw()
 
     def print_result(self,result):
 
@@ -248,6 +286,9 @@ class Calculator:
             self.root.geometry("460x420")
         elif current_tab == "Matrix Calculator":
             self.root.geometry("710x350")
+        
+        elif current_tab == 'Graphing Utility':
+            self.root.geometry('600x500')
 
 
 if __name__ == "__main__":
