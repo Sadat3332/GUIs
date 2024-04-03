@@ -5,7 +5,7 @@ import pandas as pd
 class Pokedex:
     def __init__(self, root):
         self.root = root
-        self.root.geometry('580x440')
+        self.root.geometry('600x440')
         self.root.title("Pokedex")
         self.root.resizable(False,False)
 
@@ -47,16 +47,33 @@ class Pokedex:
 
 
     def create_pokemon_list(self):
+
         self.pokemon_list_frame = Frame(self.pokemon_tab_frame,borderwidth=3, relief="groove",
                                         bg='red')
         self.pokemon_list_frame.pack(side='right', fill='y', expand=True)
+
+
+        self.search_frame = Frame(self.pokemon_list_frame,bg='white',bd=5,highlightcolor="black",highlightbackground='black', highlightthickness=1)
+        self.search_frame.pack(side='top')
+
+
+
+        self.pokemon_search_entry = Entry(self.search_frame,bg='white',relief='groove',bd=3)
+        self.pokemon_search_entry.pack(side='right',padx=10,pady=10)
+        self.pokemon_search_entry.bind('<KeyRelease>', self.filter_pokemon_list)
+
+        search_icon = PhotoImage(file='images/pokedex-icon.png').subsample(7, 7)  # Adjust subsample ratio as needed
+        self.search_button = Button(self.search_frame, image=search_icon, bg='white', bd=0)
+        self.search_button.image = search_icon
+        self.search_button.pack(side='left', padx=(0, 10))
+
 
         self.scrollbar = ttk.Scrollbar(self.pokemon_list_frame, orient='vertical')
         self.scrollbar.pack(side='right', fill='y')
 
         self.pokemon_listbox = Listbox(self.pokemon_list_frame, yscrollcommand=self.scrollbar.set,
-                                       background='#fa2828', width=23, fg='white',
-                                       font=('Helvetica', 10, "bold"))
+                                       background='#fa2820', width=23, fg='white',
+                                       font=('Helvetica', 10, "bold"),highlightcolor="black",highlightbackground='black', highlightthickness=3)
         self.pokemon_listbox.pack(side='left', fill='both', expand=True)
 
         self.scrollbar.config(command=self.pokemon_listbox.yview)
@@ -67,7 +84,13 @@ class Pokedex:
         for name in pokemon_names:
             self.pokemon_listbox.insert('end', name)
         
-    
+    def filter_pokemon_list(self, event):
+        search_term = self.pokemon_search_entry.get().lower()
+        self.pokemon_listbox.delete(0, 'end')
+        for name in self.poke_df['name']:
+            if search_term in name.lower():
+                self.pokemon_listbox.insert('end', name)
+
     def create_pokemon_image(self):
         
         self.pokemon_display_frame = Frame(self.pokemon_tab_frame, borderwidth=5, relief="groove",
@@ -157,23 +180,38 @@ class Pokedex:
                                         )
         self.pokemon_name_label_info.grid(row=1,column=0,sticky='nw')
         
+        self.pokemon_classification = self.poke_df.loc[self.curr_index,'classfication']
 
         self.pokemon_types_frame  = Frame(self.info_frame_image,bg='white')
         self.pokemon_types_frame.grid(row=2,column=0,sticky='nw',padx=8)
+
         
         self.pokemon_type_label_1 = Label(self.pokemon_types_frame, text=self.get_type()[0], padx=2,
                                         bg='white',
                                         font=('Helvetica', 10, "bold"),
-                                        anchor='nw'
+                                        anchor='nw',background='#dce2f2'
                                         )
         self.pokemon_type_label_2 = Label(self.pokemon_types_frame, text=(self.get_type()[1]), padx=2,
                                         bg='white',
                                         font=('Helvetica', 10, "bold"),
-                                        anchor='nw'
+                                        anchor='nw',
+                                        background='#dcf2e2'
                                         )
-        self.pokemon_type_label_1.grid(row=2,column=0,sticky='nw')
-        self.pokemon_type_label_2.grid(row=2,column=1,sticky='nw')
+        
+        self.pokemon_type_label_1.grid(row=0,column=0,sticky='nw')
+        self.pokemon_type_label_2.grid(row=0,column=1,sticky='nw')
 
+        # self.pokemon_classification_label = Label(self.pokemon_types_frame, text='', padx=20,background='white'
+        #                                 ).grid(row=0,column=2)
+
+        self.pokemon_classification_label = Label(self.pokemon_types_frame, text=self.pokemon_classification, padx=20,
+                                        bg='white',
+                                        font=('Helvetica', 10, "bold"),
+                                        background='#f2dce7'
+                                        
+                                        )
+        self.pokemon_classification_label.grid(row=0,column=2)
+        
 
         self.create_attributes_bar()
 
@@ -197,9 +235,13 @@ class Pokedex:
         return types
 
     def poke_selected(self):
-        self.curr_index = self.pokemon_listbox.curselection()[0]
+
+        self.curr_name = self.pokemon_listbox.get(self.pokemon_listbox.curselection()[0])
+
+        self.curr_index = int(self.curr_name[:3])-1
         self.pokemon_name_label.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
         self.pokemon_name_label_info.config(text=str(self.poke_df.loc[self.curr_index, 'name'][4:]))
+        self.pokemon_classification = self.poke_df.loc[self.curr_index,'classfication']
 
         self.pokemon_type_label_1.config(text=self.get_type()[0])
         self.pokemon_type_label_2.config(text=self.get_type()[1])
@@ -216,6 +258,8 @@ class Pokedex:
 
         self.height_label.config(text = 'Height: '+ str(self.poke_df.loc[self.curr_index,'height_m']) + ' m')
         self.weight_label.config(text='Weight: '+ str(self.poke_df.loc[self.curr_index,'weight_kg']) + ' kg')
+
+        self.pokemon_classification_label.config(text=self.pokemon_classification)
 
     def update_pokemon_image(self, image_path):
         try:
