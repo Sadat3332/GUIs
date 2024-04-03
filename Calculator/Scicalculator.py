@@ -16,6 +16,9 @@ class Calculator:
         self.root.configure(background = 'green')
         self.root.protocol("WM_DELETE_WINDOW", self.root.quit)
 
+        self.icon = PhotoImage(file='icon.png')
+        root.iconphoto(False, self.icon)
+
 
         self.style = ttk.Style()
         self.style.configure('TNotebook', tabposition='n')
@@ -35,10 +38,12 @@ class Calculator:
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
+        
+
         self.create_calculator()
         self.create_matrix_calculator()
         self.create_graphing_frame()
-    
+
     def create_calculator(self):
 
         def button_click(char):
@@ -49,7 +54,7 @@ class Calculator:
         def clear():
             entry.delete(0, END)
 
-        def equal():
+        def equal(event = None):
             try:
                 result = eval(entry.get())
                 entry.delete(0, END)
@@ -59,9 +64,9 @@ class Calculator:
                 entry.insert(0, "Error")
 
 
-        self.calculator_frame.bind('<Return>',lambda x : equal()) # bind enter key
         entry = Entry(self.calculator_frame, width=35, borderwidth=5,font={'size':20})
         entry.grid(row=0, column=0, columnspan=4, padx=10, pady=20)
+        entry.bind('<Return>',equal) # bind enter key
 
         buttons = [
             ('7', 1, 0), ('8', 1, 1), ('9', 1, 2), ('/', 1, 3),
@@ -83,9 +88,11 @@ class Calculator:
         equal_button.grid(row=5, column=2, columnspan=2)
 
     def create_matrix_calculator(self):
+        dimension_label = Label(self.matrix_calculator_frame,text="Select Dimensions: ")
+        dimension_label.grid(row=0,column=0)
         self.dimensions = ttk.Combobox(self.matrix_calculator_frame, values=[2, 3, 4, 5])
         self.dimensions.set("2")
-        self.dimensions.grid(row=0, column=0, padx=10, pady=10)
+        self.dimensions.grid(row=0, column=1, padx=2, pady=10)
         self.dimensions.bind("<<ComboboxSelected>>", self.create_matrices)
 
         mat_frame_row  = 2
@@ -100,13 +107,16 @@ class Calculator:
         self.res_frame = Frame(self.matrix_calculator_frame)
         self.res_frame.grid(row=mat_frame_row,column=2,padx=20,pady=10)
 
+        operation_label = Label(self.matrix_calculator_frame,text="Select Operation: ")
+        operation_label.grid(row=3,column=0)
+
         self.operation = ttk.Combobox(self.matrix_calculator_frame, values=["Add", "Subtract", "Multiply","Determinant","Inverse Mat 1",
                                                                             "Inverse Mat 2"])
         self.operation.set("Add")
-        self.operation.grid(row=3, column=0, padx=5, pady=10)
+        self.operation.grid(row=3, column=1, padx=5, pady=10)
 
         self.calculate_button = Button(self.matrix_calculator_frame, text="Calculate", command=self.calculate)
-        self.calculate_button.grid(row=3, column=1, padx=20, pady=10)
+        self.calculate_button.grid(row=3, column=2, padx=20, pady=10)
 
     def create_matrices(self, event=None):
         self.clear_matrix_frames()
@@ -121,8 +131,8 @@ class Calculator:
             row_entries1 = []
             row_entries2 = []
             for j in range(dimension):
-                entry1 = Entry(self.matrix_frame1, width=5)
-                entry2 = Entry(self.matrix_frame2, width=5)
+                entry1 = Entry(self.matrix_frame1, width=6)
+                entry2 = Entry(self.matrix_frame2, width=6)
                 entry1.grid(row=i, column=j, padx=5, pady=5,)
                 entry2.grid(row=i, column=j, padx=5, pady=5)
                 row_entries1.append(entry1)
@@ -135,6 +145,7 @@ class Calculator:
         self.func_entry = Entry(self.graph_tab,font=('Helvetica',15,'bold'),relief='groove',bd=4)
         self.func_entry.pack(side="top", fill="x", padx=10, pady=10)
         self.func_entry.insert(0, "sin(x)")
+        self.func_entry.bind('<Return>',self.plot_graph)
 
         self.graph_button = Button(self.graph_tab, text="Graph", command=self.plot_graph)
         self.graph_button.pack(side="top", padx=10, pady=5)
@@ -143,10 +154,10 @@ class Calculator:
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_tab)
         self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True)
 
-    def plot_graph(self):
+    def plot_graph(self,event = None):
         self.ax.clear()
         try:
-            x1 = list(np.arange(-10,11,0.2))
+            x1 = list(np.arange(-15,15,0.2))
             x2 = list(np.arange(0.000001,15,0.2))
             y = [eval(self.func_entry.get()) for x in x1]
             
@@ -174,7 +185,7 @@ class Calculator:
         for i in range(1,dimension+1):
             row_result = []
             for j in range(dimension):
-                res = Entry(self.res_frame, width=5)
+                res = Entry(self.res_frame, width=6,font=('Helvetica',12,'bold'))
                 res.insert(0,round(result[i-1][j],2))
                 res.config(state='disabled')
                 res.grid(row=i, column=j, padx=5, pady=5)
@@ -248,8 +259,8 @@ class Calculator:
                     res_label.grid(row=1,column=0, columnspan=self.dimensions.get())
 
     def Determinant(self,mat1,mat2):
-        det1 = np.linalg.det(mat1)
-        det2 = np.linalg.det(mat2)
+        det1 = round(np.linalg.det(mat1),2)
+        det2 = round(np.linalg.det(mat2),2)
         self.clear_result_frame()
         res_label = Label(self.res_frame,text="Determinant")
         res_label.grid(row=0,column=0, columnspan=self.dimensions.get())
@@ -285,7 +296,7 @@ class Calculator:
         if current_tab == "Calculator":
             self.root.geometry("460x420")
         elif current_tab == "Matrix Calculator":
-            self.root.geometry("710x350")
+            self.root.geometry("820x400")
         
         elif current_tab == 'Graphing Utility':
             self.root.geometry('600x500')
