@@ -7,7 +7,7 @@ class Pokedex:
         self.root = root
         self.root.geometry('600x440')
         self.root.title("Pokedex")
-        self.root.resizable(False,False)
+        # self.root.resizable(False,False)
 
         self.icon = PhotoImage(file='images/pokedex-icon.png')
         root.iconphoto(False, self.icon)
@@ -17,7 +17,7 @@ class Pokedex:
         self.poke_df = pd.read_csv('poke.csv')
 
         self.style = ttk.Style()
-        self.style.configure('TNotebook', tabposition='n')
+        self.style.configure('TNotebook', tabposition='center')
 
         self.tabs = ttk.Notebook(root)
         self.tabs.pack(fill="both", expand=True)
@@ -109,7 +109,7 @@ class Pokedex:
         # pokemon name
         self.pokemon_name_label = Label(self.pokemon_display_frame, text="Bulbasaur", padx=10, pady=10,
                                         bg='#f5edef',
-                                        font=('Helvetica', 12, "bold"),
+                                        font=('Helvetica', 14, "bold"),
                                         )
         self.pokemon_name_label.pack(pady=5, expand=True)
 
@@ -169,21 +169,27 @@ class Pokedex:
         self.info_frame_image = Frame(self.info_tab,bg='white',borderwidth=4, relief="groove",
                                             highlightbackground="black", highlightthickness=2)
         self.info_frame_image.grid(row=0,column=0,padx=10)
+
+        pokedexi = PhotoImage(file='images/pokemon_logo.png').subsample(10, 10)  # Adjust subsample ratio as needed
+        search_button = Button(self.info_frame_image, image=pokedexi, bg='white', bd=0)
+        search_button.image = pokedexi
+        search_button.grid(row=0,column=0)
+
         self.pokemon_info_image_label = Label(self.info_frame_image, bg='white')
         self.pokemon_info_image_label.config(image=self.pokeimage)
-        self.pokemon_info_image_label.grid(row=0, column=0, padx=10, pady=5, sticky='nw')
+        self.pokemon_info_image_label.grid(row=1, column=0, padx=10, pady=5, sticky='nw')
 
         self.pokemon_name_label_info = Label(self.info_frame_image, text="Bulbasaur", padx=10,
                                         bg='white',
                                         font=('Helvetica', 14, "bold"),
                                         anchor='nw'
                                         )
-        self.pokemon_name_label_info.grid(row=1,column=0,sticky='nw')
+        self.pokemon_name_label_info.grid(row=2,column=0,sticky='nw')
         
         self.pokemon_classification = self.poke_df.loc[self.curr_index,'classfication']
 
         self.pokemon_types_frame  = Frame(self.info_frame_image,bg='white')
-        self.pokemon_types_frame.grid(row=2,column=0,sticky='nw',padx=8)
+        self.pokemon_types_frame.grid(row=3,column=0,sticky='nw',padx=8)
 
         
         self.pokemon_type_label_1 = Label(self.pokemon_types_frame, text=self.get_type()[0], padx=2,
