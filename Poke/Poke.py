@@ -7,7 +7,7 @@ class Pokedex:
         self.root = root
         self.root.geometry('600x440')
         self.root.title("Pokedex")
-        # self.root.resizable(False,False)
+        self.root.resizable(False,False)
 
         self.icon = PhotoImage(file='images/pokedex-icon.png')
         root.iconphoto(False, self.icon)
@@ -97,7 +97,6 @@ class Pokedex:
                                             highlightbackground="black", highlightthickness=2)
 
         self.pokemon_display_frame.pack(side='left', fill='both', expand=True)
-        #separator
         ttk.Separator(
             master=self.pokemon_tab_frame,
             orient=VERTICAL,
@@ -105,8 +104,7 @@ class Pokedex:
             class_=ttk.Separator,
             takefocus=1,
             cursor='man').pack(fill=Y, expand=True)
-        
-        # pokemon name
+
         self.pokemon_name_label = Label(self.pokemon_display_frame, text="Bulbasaur", padx=10, pady=10,
                                         bg='#f5edef',
                                         font=('Helvetica', 14, "bold"),
@@ -114,13 +112,11 @@ class Pokedex:
         self.pokemon_name_label.pack(pady=5, expand=True)
 
         self.pokemon_display_frame.config(bg='#f5edef')
-        # pokemon image
         self.pokeimage = PhotoImage(file='images/1.png', ).subsample(1)
         self.pokelabel = Label(self.pokemon_display_frame, image=self.pokeimage, bg='#f5edef')
         self.pokelabel.pack()
         self.pokelabel.configure(image=self.pokeimage, bg='#f5edef')
 
-        # Description
         self.text = Text(self.pokemon_display_frame, height=10, width=45, bg='#e6e1e2')
         self.text.pack(side='bottom', anchor='sw')
         self.text.insert(END, self.poke_df.loc[0, 'Description'])
@@ -230,7 +226,7 @@ class Pokedex:
         self.type_1 = self.poke_df.loc[self.curr_index,'type1']
         self.type_2 = self.poke_df.loc[self.curr_index,'type2']
         types = []
-        if type(self.type_2)==str :#checking for type 2
+        if type(self.type_2)==str :
             types.append(self.type_1)
             types.append(self.type_2)
         
@@ -274,7 +270,7 @@ class Pokedex:
             self.pokemon_info_image_label.config(image=pokemon_image)
             self.pokemon_info_image_label.image = pokemon_image  
         except:
-            default_image = PhotoImage(file='images/2.png').subsample(1)
+            default_image = PhotoImage(file='images/1.png').subsample(1)
             self.pokelabel.configure(image=default_image)
             self.pokemon_info_image_label.config(image=default_image)
             self.pokemon_info_image_label.image = default_image 
