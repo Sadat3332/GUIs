@@ -29,3 +29,14 @@
 - Run the app
   ```sh
   python3 pokedex.py
+
+## Project Structure
+    poke/
+    ├── images/
+    │ ├── Readme/
+    | ├── 1.png
+    │ ├── 2.png
+    │ ├── ...
+    ├── poke.csv
+    ├── pokedex.py
+    └── README.md
